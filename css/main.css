@@ -1,0 +1,11 @@
+.hover-item {
+    stroke: #FFF;
+}
+
+.max-item {
+    stroke: #FFF;
+}
+
+.no-hover-item {
+    stroke: none;
+}
