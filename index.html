@@ -22,15 +22,27 @@
             </nav>
         </div>
         <div class="container">
-            <div id="video_state">
-                <h4 class="left" id="current_frame">0</h4>
-                <h4 class="left">/</h4>
-                <h4 class="left" id="all_frame"></h4>
+            <div id="video_state" class="row valign-wrapper">
+                <div class="col s6">
+                    <h4 class="left" id="current_frame">0</h4>
+                    <h4 class="left">/</h4>
+                    <h4 class="left" id="all_frame"></h4>                    
+                </div>
+                <div class="input-field col s4">
+                    <input placeholder="loading..." id="video_fps_value" type="text" class="validate" disabled>
+                </div>
+                <div class="col s2 valign">
+                    <button id="video_fps" class="btn waves-effect waves-light grey darken-1">submit
+                        <i class="material-icons right">send</i>
+                    </button>                    
+                </div>
             </div>
-            <div id="video_wrapper">
-                <video id="video_data" src="./res/woods.mp4"></video>
-                <div id="viewpoint_trajectory"></div>
-            </div>
+        </div>            
+        <div id="video_wrapper">
+            <video id="video_data" src="./res/woods.mp4"></video>
+            <div id="viewpoint_trajectory"></div>
+        </div>
+        <div class="container">
             <div id="video_controller">
                 <button id="video_play" class="btn waves-effect waves-light grey darken-1">Play
                     <i class="material-icons right">play_arrow</i>

@@ -5,40 +5,43 @@ window.addEventListener("load", function () {
         viewpoint_index = 0,
         mouse_down_flag = false,
         video_object,
-        video_component,
+        video_component = document.getElementById('video_data'),
         video_whole_frame,
         last_cursor_position,
-        trajectory_panel,
+        trajectory_panel = document.getElementById('viewpoint_trajectory'),
         trajectory_panel_svg,
         trajectory_line_svg = d3.line()
     .x(function(d){return d.x;})
     .y(function(d){return d.y;}),
         line_data = [];
     
-    (function init() {
+    var init = (function(_framerate) {
         video_object = VideoFrame({
             id: 'video_data',
-            frameRate: 23.98,
+            frameRate: _framerate,
             callback: function(frame) {
                 // current frame number
                 document.getElementById('current_frame').innerHTML = frame;
             }
         });
         
-        video_component = document.getElementById('video_data');
         video_whole_frame = video_object.frameRate * video_component.duration;
         document.getElementById('all_frame').innerHTML = Math.round(video_whole_frame);
 
         // initialize width and height of trajectory panel
-        trajectory_panel = document.getElementById('viewpoint_trajectory');
         trajectory_panel.style.width = video_object.video.videoWidth;
         trajectory_panel.style.height = video_object.video.videoHeight;
+        document.getElementById('video_wrapper').style.width = video_object.video.videoWidth;
         
         trajectory_panel_svg = d3.select('#viewpoint_trajectory')
         .append('svg')
         .attr('width', video_object.video.videoWidth)
         .attr('height', video_object.video.videoHeight);
-    })();
+    });
+    
+    document.getElementById('video_fps').addEventListener('click', function(event) {
+        init(document.getElementById('video_fps_value').text);
+    });
     
     document.getElementById('video_play').addEventListener('click', function(event) {
         video_object.video.play();
@@ -52,6 +55,11 @@ window.addEventListener("load", function () {
     
     document.getElementById('export_json').addEventListener('click', function(event) {
         exportJSON(important_viewpoints);
+    });
+    
+    video_component.addEventListener('canplay', function(event) {
+        document.getElementById('video_fps_value').disabled = false;
+        document.getElementById('video_fps_value').setAttribute('placeholder', 'input framerate');
     });
     
     trajectory_panel.addEventListener('mouseenter', function(event) {
