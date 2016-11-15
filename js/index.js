@@ -45,19 +45,62 @@ window.addEventListener("load", function () {
         video_object.listen('frame');
     });
     
-    document.getElementById('video_data').addEventListener('mousemove', function(event) {
-        // process every frame
-        if (mouse_down_flag)
-            console.log(event);
+    document.getElementById('video_pause').addEventListener('click', function(event) {
+        video_object.video.pause();
+        video_object.stopListen();
     });
     
-    document.getElementById('video_data').addEventListener('mousedown', function(event) {
+    document.getElementById('export_json').addEventListener('click', function(event) {
+        exportJSON(important_viewpoints);
+    });
+    
+    trajectory_panel.addEventListener('mouseenter', function(event) {
+        if (!video_object.video.paused) {
+            video_object.video.playbackRate = 0.5;
+        }
+    });
+    
+    trajectory_panel.addEventListener('mouseleave', function(event) {
+        if (!video_object.video.paused) {
+            video_object.video.playbackRate = 1;
+
+            // leave a cursor when drawing trajectory
+            if (mouse_down_flag) {
+                video_object.video.pause();
+            }
+        }
+    });
+    
+    trajectory_panel.addEventListener('mousedown', function(event) {
         // save initial state
+        // offsetX, offsetY
+        // list of events
         mouse_down_flag = true;
-        console.log(event);
+        viewpoint_index++;
+        line_data = new Array();
+        
+        important_viewpoints[viewpoint_index] = new Array();
     });
     
-    document.getElementById('video_data').addEventListener('mouseup', function(event) {
+    trajectory_panel.addEventListener('mousemove', function(event) {
+        // process every frame
+        if (mouse_down_flag) {
+            console.log(event);
+            important_viewpoints[viewpoint_index].push({
+                x: event.offsetX,
+                y: event.offsetY,
+                frame: video_object.get()
+            });
+            
+            line_data.push({
+                x: event.offsetX,
+                y: event.offsetY
+            });
+            drawTrajectory(line_data);
+        }
+    });
+    
+    trajectory_panel.addEventListener('mouseup', function(event) {
         // save mouse trajectory
         mouse_down_flag = false;
         console.log(event);
