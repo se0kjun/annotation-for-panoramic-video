@@ -1,11 +1,12 @@
-.hover-item {
-    stroke: #FFF;
+#video_controller {
 }
 
-.max-item {
-    stroke: #FFF;
+div.container {
+    margin-top:20px;
+    z-index:-1;
 }
 
-.no-hover-item {
-    stroke: none;
+#viewpoint_trajectory {
+    position: absolute;
+    top: 150px;    
 }

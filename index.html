@@ -21,9 +21,26 @@
                 </div>
             </nav>
         </div>
-        <div class="container" style="margin-top:20px;z-index:-1;">                
+        <div class="container">
+            <div id="video_state">
+                <h4 class="left" id="current_frame">0</h4>
+                <h4 class="left">/</h4>
+                <h4 class="left" id="all_frame"></h4>
+            </div>
             <div id="video_wrapper">
                 <video id="video_data" src="./res/woods.mp4"></video>
+                <div id="viewpoint_trajectory"></div>
+            </div>
+            <div id="video_controller">
+                <button id="video_play" class="btn waves-effect waves-light grey darken-1">Play
+                    <i class="material-icons right">play_arrow</i>
+                </button>
+                <button id="video_pause" class="btn waves-effect waves-light grey darken-1">Pause
+                    <i class="material-icons right">pause</i>
+                </button>
+                <button id="export_json" class="btn waves-effect waves-light grey darken-1 right">SAVE
+                    <i class="material-icons right">save</i>
+                </button>
             </div>
         </div>
     </body>
