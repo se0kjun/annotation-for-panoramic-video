@@ -75,6 +75,10 @@ window.addEventListener("load", function () {
             // leave a cursor when drawing trajectory
             if (mouse_down_flag) {
                 video_object.video.pause();
+                last_cursor_position = {
+                    x: event.offsetX,
+                    y: event.offsetY
+                };                
             }
         }
     });
@@ -86,8 +90,12 @@ window.addEventListener("load", function () {
         mouse_down_flag = true;
         viewpoint_index++;
         line_data = new Array();
-        
         important_viewpoints[viewpoint_index] = new Array();
+        
+        if (video_object.video.paused) {
+            video_object.video.playbackRate = 0.5;
+            video_object.video.play();
+        }
     });
     
     trajectory_panel.addEventListener('mousemove', function(event) {
@@ -111,6 +119,11 @@ window.addEventListener("load", function () {
     trajectory_panel.addEventListener('mouseup', function(event) {
         // save mouse trajectory
         mouse_down_flag = false;
+        last_cursor_position = {
+            x: event.offsetX,
+            y: event.offsetY
+        };
+        
         console.log(event);
     });
     
