@@ -106,6 +106,17 @@ window.addEventListener("load", function () {
         console.log(event);
     });
     
-    function exportJSON() {
+    function exportJSON(param) {
+    }
+    
+    function drawTrajectory(data) {
+        var line_panel = trajectory_panel_svg.append('g');
+        
+        // draw every line 
+        line_panel.append('path')
+        .attr('d', trajectory_line_svg(line_data))
+        .attr('stroke', 'white')
+        .attr('stroke-width', 2)
+        .attr('fill', 'none');
     }
 });
