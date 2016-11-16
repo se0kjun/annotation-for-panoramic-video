@@ -134,10 +134,39 @@ window.addEventListener("load", function () {
         var line_panel = trajectory_panel_svg.append('g');
         
         // draw every line 
-        line_panel.append('path')
-        .attr('d', trajectory_line_svg(line_data))
-        .attr('stroke', 'white')
-        .attr('stroke-width', 2)
-        .attr('fill', 'none');
+        line_data.reduce(function(prev, curr, curr_idx) {
+            line_panel.append('path')
+            .attr('d', trajectory_line_svg([curr, prev]))
+            .attr('stroke', 'white')
+            .attr('stroke-width', 2)
+            .attr('fill', 'none')
+            .attr('id', curr_idx);
+            
+            return curr;
+        }, line_data[0]);
+        
+        if (last_cursor_position) {
+            d3.select('.trajectory_end').remove();
+            
+            line_panel.append('circle')
+            .attr('cx', last_cursor_position.x)
+            .attr('cy', last_cursor_position.y)
+            .attr('r', 5)
+            .attr('fill', 'red')
+            .attr('class', 'trajectory_end')
+            .on('mouseover', trajectorySnap)
+            .on('mouseleave', trajectoryUnsnap);
+        }
+    }
+    
+    function trajectorySnap(elem) {
+        d3.select(this)
+        .attr('fill', 'green');
+    }
+    
+    function trajectoryUnsnap(elem) {
+        console.log(this);
+        d3.select(this)
+        .attr('fill', 'red');        
     }
 });
