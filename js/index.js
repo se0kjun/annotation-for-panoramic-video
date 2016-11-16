@@ -25,7 +25,11 @@ window.addEventListener("load", function () {
         trajectory_line_svg = d3.line()
     .x(function(d){return d.x;})
     .y(function(d){return d.y;}),
-        line_data = [];
+        line_data = [],
+        svg_panels = {},
+        circle_click_flag = false,
+        last_cursor_hover = false,
+        current_line_color;
     
     var init = (function(_framerate) {
         video_object = VideoFrame({
@@ -50,6 +54,9 @@ window.addEventListener("load", function () {
         .append('svg')
         .attr('width', video_object.video.videoWidth)
         .attr('height', video_object.video.videoHeight);
+        
+        svg_panels.line = trajectory_panel_svg.append('g').attr('id', 'line_panel');
+        svg_panels.circle = trajectory_panel_svg.append('g').attr('id', 'circle_panel');
     });
     
     document.getElementById('video_fps').addEventListener('click', function(event) {
@@ -91,7 +98,10 @@ window.addEventListener("load", function () {
                 last_cursor_position = {
                     x: event.offsetX,
                     y: event.offsetY
-                };                
+                };    
+                
+                // update circle
+                drawLastPosition();
             }
         }
     });
@@ -100,21 +110,27 @@ window.addEventListener("load", function () {
         // save initial state
         // offsetX, offsetY
         // list of events
-        mouse_down_flag = true;
-        viewpoint_index++;
-        line_data = new Array();
-        important_viewpoints[viewpoint_index] = new Array();
+        console.log('mousedown', circle_click_flag);
+        if (!circle_click_flag) {
+            mouse_down_flag = true;
+            viewpoint_index++;
+            current_line_color = getRandomColor();
+            line_data = new Array();
+            important_viewpoints[viewpoint_index] = new Array();
+        } else {
+            circle_click_flag = false;
+        }
         
+        // fire mousedown when pausing video
         if (video_object.video.paused) {
             video_object.video.playbackRate = 0.5;
             video_object.video.play();
-        }
+        }        
     });
     
     trajectory_panel.addEventListener('mousemove', function(event) {
         // process every frame
         if (mouse_down_flag) {
-            console.log(event);
             important_viewpoints[viewpoint_index].push({
                 x: event.offsetX,
                 y: event.offsetY,
@@ -125,6 +141,19 @@ window.addEventListener("load", function () {
                 x: event.offsetX,
                 y: event.offsetY
             });
+            
+            updateTrajectoryInfo(viewpoint_index);
+        }
+        
+        if (!last_cursor_hover) {
+            // show more clearly the position of cursor
+            d3.select('#mouse_position').remove();
+            svg_panels.line.append('circle')
+            .attr('cx', event.offsetX)
+            .attr('cy', event.offsetY)
+            .attr('r', 5)
+            .attr('fill', 'red')
+            .attr('id', 'mouse_position');
         }
     });
     
@@ -136,50 +165,82 @@ window.addEventListener("load", function () {
             y: event.offsetY
         };
         
-        console.log(event);
+        // update circle
+        drawLastPosition();
+        video_object.video.pause();
     });
     
     function exportJSON(param) {
     }
     
+    // call every frame 
     function drawTrajectory(data) {
-        var line_panel = trajectory_panel_svg.append('g');
+        // remove line just previous frame
+        // d3.selectAll('.viewpoint-trajectory').remove();
         
         // draw every line 
         line_data.reduce(function(prev, curr, curr_idx) {
-            line_panel.append('path')
+            svg_panels.line.append('path')
             .attr('d', trajectory_line_svg([curr, prev]))
-            .attr('stroke', 'white')
+            .attr('stroke', current_line_color)
             .attr('stroke-width', 2)
             .attr('fill', 'none')
-            .attr('id', curr_idx);
+            .attr('class', 'viewpoint-trajectory');
             
             return curr;
         }, line_data[0]);
-        
+    }
+    
+    // call function after clicked video panel
+    function drawLastPosition() {
         if (last_cursor_position) {
             d3.select('.trajectory_end').remove();
             
-            line_panel.append('circle')
+            svg_panels.circle.append('circle')
             .attr('cx', last_cursor_position.x)
             .attr('cy', last_cursor_position.y)
             .attr('r', 5)
             .attr('fill', 'red')
             .attr('class', 'trajectory_end')
             .on('mouseover', trajectorySnap)
-            .on('mouseleave', trajectoryUnsnap);
+            .on('mouseleave', trajectoryUnsnap)
+            .on('mousedown', trajectoryStart);
         }
     }
     
-    function trajectorySnap(elem) {
+    // mouseover for the last position of cursor
+    function trajectorySnap() {
         d3.select(this)
-        .attr('fill', 'green');
+        .attr('fill', 'orange')
+        .attr('r', 10);
+        last_cursor_hover = true;
     }
     
-    function trajectoryUnsnap(elem) {
-        console.log(this);
+    // mouseleave for the last position of cursor
+    function trajectoryUnsnap() {
         d3.select(this)
-        .attr('fill', 'red');        
+        .attr('fill', 'red')
+        .attr('r', 5);
+        last_cursor_hover = false;
+    }
+    
+    // mousedown for the last positino of cursor
+    // draw trajectory continuously
+    function trajectoryStart() {
+        console.log('circle click');
+        circle_click_flag = true;
+        mouse_down_flag = true;
+    }
+    
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        
+        return color;
+    }
     
     function updateTrajectoryInfo(update_index) {
         var update_table = document.getElementById('trajectory_info'),
