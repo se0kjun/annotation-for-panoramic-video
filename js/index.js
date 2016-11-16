@@ -180,5 +180,34 @@ window.addEventListener("load", function () {
         console.log(this);
         d3.select(this)
         .attr('fill', 'red');        
+    
+    function updateTrajectoryInfo(update_index) {
+        var update_table = document.getElementById('trajectory_info'),
+            table_item = '<div id="{0}" class="row valign-wrapper">\
+                    <div class="col s2">{1}</div>\
+                    <div class="col s2">{2}</div>\
+                    <div class="col s4">{3}</div>\
+                    <div class="col s4" style="background-color:{4};height:22px;"></div>\
+                </div>';
+        
+        var prefix = 'trajectory_',
+            update_item = document.getElementById(prefix + update_index);
+        
+        // element already exists
+        if (update_item) {
+            update_item.children[0].innerHTML = update_index;
+            update_item.children[1].innerHTML = important_viewpoints[update_index][0].frame + '-' + important_viewpoints[update_index][important_viewpoints[update_index].length - 1].frame;
+            update_item.children[2].innerHTML = video_object.toSMPTE(important_viewpoints[update_index][0].frame) + '-' + video_object.toSMPTE(important_viewpoints[update_index][important_viewpoints[update_index].length - 1].frame);
+            update_item.children[3].setAttribute('style', 'background-color:' + current_line_color + ';height:22px;');
+        } else {
+            $(update_table).append(
+                table_item.format(
+                    prefix + update_index,
+                    update_index,
+                    important_viewpoints[update_index][0].frame + '-' + important_viewpoints[update_index][important_viewpoints[update_index].length - 1].frame,
+                    video_object.toSMPTE(important_viewpoints[update_index][0].frame) + '-' + video_object.toSMPTE(important_viewpoints[update_index][important_viewpoints[update_index].length - 1].frame),
+                    current_line_color
+                ));            
+        }
     }
 });
