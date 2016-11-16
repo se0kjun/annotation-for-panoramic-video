@@ -22,6 +22,7 @@ window.addEventListener("load", function () {
             callback: function(frame) {
                 // current frame number
                 document.getElementById('current_frame').innerHTML = frame;
+                drawTrajectory(line_data);
             }
         });
         
@@ -112,7 +113,6 @@ window.addEventListener("load", function () {
                 x: event.offsetX,
                 y: event.offsetY
             });
-            drawTrajectory(line_data);
         }
     });
     
