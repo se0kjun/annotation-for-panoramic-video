@@ -29,7 +29,9 @@ window.addEventListener("load", function () {
         svg_panels = {},
         circle_click_flag = false,
         last_cursor_hover = false,
-        current_line_color;
+        current_line_color,
+        line_trajectory_prefix = 'line_trajectory_',
+        table_item_prefix = 'trajectory_';
     
     var init = (function(_framerate) {
         video_object = VideoFrame({
@@ -125,7 +127,7 @@ window.addEventListener("load", function () {
         if (video_object.video.paused) {
             video_object.video.playbackRate = 0.5;
             video_object.video.play();
-        }        
+        }
     });
     
     trajectory_panel.addEventListener('mousemove', function(event) {
@@ -173,6 +175,29 @@ window.addEventListener("load", function () {
     function exportJSON(param) {
     }
     
+    // type previous, all, specific
+    function removePreviousTrajectory(data) {
+        var traj_idx = data || 
+            {
+                type: 'previous',
+                data: -1
+            };
+        
+        switch(traj_idx.type) {
+            case 'previous':
+                if (important_viewpoints.length > 0) {
+                    d3.selectAll('.' + line_trajectory_prefix + important_viewpoints.length).remove();
+                }
+                break;
+            case 'specific':
+                d3.selectAll(traj_idx.data).remove();
+                break;
+            case 'all':
+                d3.selectAll('path').remove();
+                break;
+        }
+    }
+    
     // call every frame 
     function drawTrajectory(data) {
         // remove line just previous frame
@@ -185,7 +210,7 @@ window.addEventListener("load", function () {
             .attr('stroke', current_line_color)
             .attr('stroke-width', 2)
             .attr('fill', 'none')
-            .attr('class', 'viewpoint-trajectory');
+            .attr('class', 'viewpoint-trajectory ' + line_trajectory_prefix + viewpoint_index);
             
             return curr;
         }, line_data[0]);
@@ -244,15 +269,15 @@ window.addEventListener("load", function () {
     
     function updateTrajectoryInfo(update_index) {
         var update_table = document.getElementById('trajectory_info'),
-            table_item = '<div id="{0}" class="row valign-wrapper">\
+            table_item = '<div id="{0}" class="row valign-wrapper hoverable" style="margin-bottom:0px;border-bottom:#a3a3a3 solid 1px;padding:10px 0;">\
                     <div class="col s2">{1}</div>\
                     <div class="col s2">{2}</div>\
                     <div class="col s4">{3}</div>\
-                    <div class="col s4" style="background-color:{4};height:22px;"></div>\
+                    <div class="col s2" style="background-color:{4};height:22px;"></div>\
+                    <div class="col s2"><button class="btn-floating waves-effect trajectory-play green"><i class="material-icons">play_arrow</i></button><button class="btn-floating waves-effect trajectory-remove red"><i class="material-icons">clear</i></button></div>\
                 </div>';
         
-        var prefix = 'trajectory_',
-            update_item = document.getElementById(prefix + update_index);
+        var update_item = document.getElementById(table_item_prefix + update_index);
         
         // element already exists
         if (update_item) {
@@ -263,12 +288,20 @@ window.addEventListener("load", function () {
         } else {
             $(update_table).append(
                 table_item.format(
-                    prefix + update_index,
+                    table_item_prefix + update_index,
                     update_index,
                     important_viewpoints[update_index][0].frame + '-' + important_viewpoints[update_index][important_viewpoints[update_index].length - 1].frame,
                     video_object.toSMPTE(important_viewpoints[update_index][0].frame) + '-' + video_object.toSMPTE(important_viewpoints[update_index][important_viewpoints[update_index].length - 1].frame),
                     current_line_color
-                ));            
+                ));
         }
     }
+    
+    $(document).on('click', '.trajectory-play', function(event) {
+        var click_node = event.currentTarget.parentElement.getAttribute('id');
+    });
+
+    $(document).on('click', '.trajectory-remove', function(event) {
+        var click_node = event.currentTarget.parentElement.getAttribute('id');
+    });
 });

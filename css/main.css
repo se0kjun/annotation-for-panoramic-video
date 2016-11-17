@@ -13,5 +13,17 @@ div.container {
 
 #viewpoint_trajectory {
     position: absolute;
-    top: 185px;    
+    top: 165px;    
+}
+
+.trajectory-info-head {
+    font-weight: bold;
+    padding: 20px 0;
+    border-top: #a3a3a3 solid 1px;
+    border-bottom: #a3a3a3 solid 1px;
+    margin-bottom: 0 !important;
+}
+
+#trajectory_info {
+    margin: 20px 0;
 }
