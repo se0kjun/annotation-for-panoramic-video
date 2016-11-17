@@ -30,6 +30,7 @@ window.addEventListener("load", function () {
         circle_click_flag = false,
         last_cursor_hover = false,
         current_line_color,
+        trajectory_play = {flag: false},
         line_trajectory_prefix = 'line_trajectory_',
         table_item_prefix = 'trajectory_';
     
@@ -41,6 +42,10 @@ window.addEventListener("load", function () {
                 // current frame number
                 document.getElementById('current_frame').innerHTML = frame;
                 drawTrajectory(line_data);
+                
+                if (trajectory_play.flag) {
+                    drawTrajectoryPlay(frame);
+                }
             }
         });
         
@@ -59,6 +64,7 @@ window.addEventListener("load", function () {
         
         svg_panels.line = trajectory_panel_svg.append('g').attr('id', 'line_panel');
         svg_panels.circle = trajectory_panel_svg.append('g').attr('id', 'circle_panel');
+        svg_panels.trajectory_play = trajectory_panel_svg.append('g').attr('id', 'trajectory_play_panel');
     });
     
     document.getElementById('video_fps').addEventListener('click', function(event) {
@@ -176,21 +182,30 @@ window.addEventListener("load", function () {
     }
     
     // type previous, all, specific
-    function removePreviousTrajectory(data) {
+    function removeTrajectory(data) {
         var traj_idx = data || 
             {
                 type: 'previous',
-                data: -1
+                data: -1,
+                index: -1
             };
         
         switch(traj_idx.type) {
             case 'previous':
-                if (important_viewpoints.length > 0) {
-                    d3.selectAll('.' + line_trajectory_prefix + important_viewpoints.length).remove();
+                if (important_viewpoints.length > 2) {
+                    d3.selectAll('.' + line_trajectory_prefix + (important_viewpoints.length-1)).remove();
                 }
+                
+                updateTrajectoryInfo(important_viewpoints.length-1);
                 break;
             case 'specific':
                 d3.selectAll(traj_idx.data).remove();
+                
+                important_viewpoints[traj_idx.index] = [];
+                if (important_viewpoints.length-1 == traj_idx.index)
+                    line_data = [];
+                
+                updateTrajectoryInfo(traj_idx.index);
                 break;
             case 'all':
                 d3.selectAll('path').remove();
@@ -231,6 +246,29 @@ window.addEventListener("load", function () {
             .on('mouseleave', trajectoryUnsnap)
             .on('mousedown', trajectoryStart);
         }
+    }
+    
+    function drawTrajectoryPlay(frame) {
+        if (video_object.video.currentTime > trajectory_play.end_time && trajectory_play.flag) {
+            trajectory_play.flag = false;
+            video_object.video.playbackRate = 1;
+            video_object.video.pause();
+            return;
+        }
+        
+        important_viewpoints[trajectory_play.trajectory_index].forEach(function(elem) {
+            if (elem.frame == frame) {
+                 d3.select('.trajectory_play_circle').remove();
+                
+                svg_panels.trajectory_play.append('circle')
+                .attr('cx', elem.x)
+                .attr('cy', elem.y)
+                .attr('r', 5)
+                .attr('fill', 'red')
+                .attr('class', 'trajectory_play_circle');
+                return;
+            }
+        });
     }
     
     // mouseover for the last position of cursor
@@ -298,10 +336,31 @@ window.addEventListener("load", function () {
     }
     
     $(document).on('click', '.trajectory-play', function(event) {
-        var click_node = event.currentTarget.parentElement.getAttribute('id');
+        var click_node = event.currentTarget.parentElement.parentElement;
+        var click_node_id = click_node.getAttribute('id').split(table_item_prefix)[1];
+        
+        var start_time = video_object.toSeconds(click_node.children[2].innerHTML.split('-')[0]);
+        var end_time = video_object.toSeconds(click_node.children[2].innerHTML.split('-')[1]);
+        video_object.video.pause();
+        video_object.video.currentTime = start_time;
+        video_object.video.play();
+        
+        trajectory_play = {
+            flag: true,
+            trajectory_index: click_node_id,
+            start_time: start_time,
+            end_time: end_time
+        };
     });
 
     $(document).on('click', '.trajectory-remove', function(event) {
-        var click_node = event.currentTarget.parentElement.getAttribute('id');
+        var click_node = event.currentTarget.parentElement.parentElement.getAttribute('id').split(table_item_prefix)[1];
+        event.currentTarget.parentElement.parentElement.remove();
+        
+        removeTrajectory({
+            type: 'specific',
+            data: '.' + line_trajectory_prefix + click_node,
+            index: click_node
+        });
     });
 });
