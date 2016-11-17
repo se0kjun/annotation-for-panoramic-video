@@ -85,6 +85,10 @@ window.addEventListener("load", function () {
         exportJSON(important_viewpoints);
     });
     
+    document.getElementById('trajectory_clear').addEventListener('click', function(event) {
+        removeTrajectory({type:'all'});
+    });
+    
     video_component.addEventListener('canplay', function(event) {
         document.getElementById('video_fps_value').disabled = false;
         document.getElementById('video_fps_value').setAttribute('placeholder', 'input framerate');
@@ -209,6 +213,9 @@ window.addEventListener("load", function () {
                 break;
             case 'all':
                 d3.selectAll('path').remove();
+                
+                important_viewpoints = [];
+                line_data = [];
                 break;
         }
     }
