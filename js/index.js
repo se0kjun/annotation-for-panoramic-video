@@ -82,7 +82,11 @@ window.addEventListener("load", function () {
     });
     
     document.getElementById('export_json').addEventListener('click', function(event) {
-        exportJSON(important_viewpoints);
+        var data_str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(important_viewpoints));
+        var data_anchor_elem = document.getElementById('downloadAnchorElem');
+        data_anchor_elem.setAttribute("href", data_str);
+        data_anchor_elem.setAttribute("download", "scene.json");
+        data_anchor_elem.click();
     });
     
     document.getElementById('trajectory_clear').addEventListener('click', function(event) {
@@ -181,9 +185,6 @@ window.addEventListener("load", function () {
         drawLastPosition();
         video_object.video.pause();
     });
-    
-    function exportJSON(param) {
-    }
     
     // type previous, all, specific
     function removeTrajectory(data) {
