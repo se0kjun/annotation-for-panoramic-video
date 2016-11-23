@@ -99,9 +99,9 @@ window.addEventListener("load", function () {
     });
     
     trajectory_panel.addEventListener('mouseenter', function(event) {
-        if (!video_object.video.paused) {
-            video_object.video.playbackRate = 0.5;
-        }
+//        if (!video_object.video.paused) {
+//            video_object.video.playbackRate = 0.5;
+//        }
     });
     
     trajectory_panel.addEventListener('mouseleave', function(event) {
@@ -126,20 +126,22 @@ window.addEventListener("load", function () {
         // save initial state
         // offsetX, offsetY
         // list of events
-        console.log('mousedown', circle_click_flag);
         if (!circle_click_flag) {
             mouse_down_flag = true;
-            viewpoint_index++;
-            current_line_color = getRandomColor();
-            line_data = new Array();
-            important_viewpoints[viewpoint_index] = new Array();
+            
+            if (!continuousTrajectory()) {
+                viewpoint_index++;
+                current_line_color = getRandomColor();
+                line_data = new Array();
+                important_viewpoints[viewpoint_index] = new Array();
+            }
         } else {
             circle_click_flag = false;
         }
         
         // fire mousedown when pausing video
         if (video_object.video.paused) {
-            video_object.video.playbackRate = 0.5;
+//            video_object.video.playbackRate = 0.5;
             video_object.video.play();
         }
     });
@@ -277,6 +279,17 @@ window.addEventListener("load", function () {
                 return;
             }
         });
+    }
+    
+    function continuousTrajectory() {
+        var continue_flag = document.getElementById('continue_flag');
+        
+        if (continue_flag.checked) {
+            continue_flag.checked = false;
+            return !continue_flag.checked;
+        } else {
+            return continue_flag.checked;
+        }
     }
     
     // mouseover for the last position of cursor
