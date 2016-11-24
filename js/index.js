@@ -82,7 +82,12 @@ window.addEventListener("load", function () {
     });
     
     document.getElementById('export_json').addEventListener('click', function(event) {
-        var data_str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(important_viewpoints));
+        var result_data = important_viewpoints.map(function(elem) {
+            if (elem || elem.length)
+                return elem;
+        });
+        
+        var data_str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(result_data, null, 4));
         var data_anchor_elem = document.getElementById('downloadAnchorElem');
         data_anchor_elem.setAttribute("href", data_str);
         data_anchor_elem.setAttribute("download", "scene.json");
