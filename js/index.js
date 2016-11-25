@@ -171,7 +171,7 @@ window.addEventListener("load", function () {
         if (!last_cursor_hover) {
             // show more clearly the position of cursor
             d3.select('#mouse_position').remove();
-            svg_panels.line.append('circle')
+            svg_panels.circle.append('circle')
             .attr('cx', event.offsetX)
             .attr('cy', event.offsetY)
             .attr('r', 5)
@@ -234,16 +234,20 @@ window.addEventListener("load", function () {
         // d3.selectAll('.viewpoint-trajectory').remove();
         
         // draw every line 
-        line_data.reduce(function(prev, curr, curr_idx) {
-            svg_panels.line.append('path')
-            .attr('d', trajectory_line_svg([curr, prev]))
-            .attr('stroke', current_line_color)
-            .attr('stroke-width', 2)
-            .attr('fill', 'none')
-            .attr('class', 'viewpoint-trajectory ' + line_trajectory_prefix + viewpoint_index);
-            
-            return curr;
-        }, line_data[0]);
+        if (line_data.length) {
+            if (d3.select('#' + line_trajectory_prefix + viewpoint_index).empty()) {
+                svg_panels.line.append('path')
+                .attr('d', trajectory_line_svg(line_data))
+                .attr('stroke', current_line_color)
+                .attr('stroke-width', 2)
+                .attr('fill', 'none')
+                .attr('class', 'viewpoint-trajectory ' + line_trajectory_prefix + viewpoint_index)
+                .attr('id', line_trajectory_prefix + viewpoint_index);
+            } else {
+                d3.select('#' + line_trajectory_prefix + viewpoint_index)
+                .attr('d', trajectory_line_svg(line_data));
+            }
+        }
     }
     
     // call function after clicked video panel
