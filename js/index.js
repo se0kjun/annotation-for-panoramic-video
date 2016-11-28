@@ -82,10 +82,15 @@ window.addEventListener("load", function () {
     });
     
     document.getElementById('export_json').addEventListener('click', function(event) {
-        var result_data = important_viewpoints.map(function(elem) {
-            if (elem || elem.length)
-                return elem;
-        });
+        var result_data = {
+            'frame': Math.floor(video_whole_frame),
+            'fps': video_object.frameRate,
+            'width': video_object.video.videoWidth,
+            'height': video_object.video.videoHeight,
+            'data': important_viewpoints.filter(function(elem) {
+                return (elem != undefined) || (elem != null) || (elem.length != 0);
+            })
+        };
         
         var data_str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(result_data, null, 4));
         var data_anchor_elem = document.getElementById('downloadAnchorElem');
