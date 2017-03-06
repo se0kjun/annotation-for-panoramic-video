@@ -105,7 +105,7 @@ window.addEventListener("load", function () {
     
     video_component.addEventListener('canplay', function(event) {
         document.getElementById('video_fps_value').disabled = false;
-        document.getElementById('video_fps_value').setAttribute('placeholder', 'input framerate');
+        document.getElementById('video_fps_value').setAttribute('placeholder', 'input framerate (sample video 23.97)');
     });
     
     trajectory_panel.addEventListener('mouseenter', function(event) {
