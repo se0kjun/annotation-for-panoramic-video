@@ -4,7 +4,7 @@
 
 [sample page](https://se0kjun.github.io/annotation-for-panoramic-video/ )
 
-
+First of all, you have to insert a framerate of video (framerate of sample is 23.97)
 
 ##Motivation
 
